@@ -14,7 +14,7 @@ A web application for practicing Morning Pages, a daily writing exercise popular
 
 ## How to Use
 
-1. Visit the app at [your-github-username.github.io/morning-pages-app](https://your-github-username.github.io/morning-pages-app)
+1. Visit the app at [8bitbyadog.github.io/morning-pages-app](https://8bitbyadog.github.io/morning-pages-app)
 2. Start typing in the text editor
 3. Aim to write 750 words (about 3 pages)
 4. Your progress is automatically saved in your browser
