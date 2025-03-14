@@ -54,30 +54,28 @@ class GoogleFormSubmitter {
     }
 
     try {
-      console.log('Creating form data for submission...');
-      const formData = new FormData();
-      formData.append(this.entryIdField, email);
-      
-      console.log('Attempting form submission with:', {
-        url: this.formActionUrl,
-        entryId: this.entryIdField,
-        email: email
+      // Create the URL with parameters
+      const params = new URLSearchParams({
+        [this.entryIdField]: email
       });
+      
+      const submissionUrl = `${this.formActionUrl}?${params.toString()}`;
+      
+      console.log('Attempting form submission with URL:', submissionUrl);
 
       // First, try to validate the form URL
       try {
-        new URL(this.formActionUrl);
+        new URL(submissionUrl);
       } catch (urlError) {
-        console.error('Invalid form URL:', this.formActionUrl);
+        console.error('Invalid form URL:', submissionUrl);
         return false;
       }
       
-      const response = await fetch(this.formActionUrl, {
-        method: 'POST',
+      const response = await fetch(submissionUrl, {
+        method: 'GET',
         mode: 'no-cors',
-        body: formData,
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
         }
       });
       
@@ -87,8 +85,6 @@ class GoogleFormSubmitter {
         ok: response.ok
       });
       
-      // In no-cors mode, we can't actually check the response status
-      // So we'll assume success if we got here without an error
       return true;
     } catch (error) {
       console.error('Form submission failed:', {
@@ -112,22 +108,20 @@ class GoogleFormSubmitter {
     }
 
     try {
-      console.log('Creating test form data...');
-      const formData = new FormData();
-      formData.append(this.entryIdField, testEmail);
-      
-      console.log('Test submission data:', {
-        url: this.formActionUrl,
-        entryId: this.entryIdField,
-        email: testEmail
+      // Create the URL with parameters
+      const params = new URLSearchParams({
+        [this.entryIdField]: testEmail
       });
       
-      const response = await fetch(this.formActionUrl, {
-        method: 'POST',
+      const submissionUrl = `${this.formActionUrl}?${params.toString()}`;
+      
+      console.log('Test submission URL:', submissionUrl);
+      
+      const response = await fetch(submissionUrl, {
+        method: 'GET',
         mode: 'no-cors',
-        body: formData,
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
         }
       });
       
