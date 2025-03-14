@@ -1,9 +1,42 @@
 // Import StorageManager
 import StorageManager from './storage-manager.js';
+import googleFormSubmitter from './google-form-integration.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize StorageManager
     const storageManager = new StorageManager();
+
+    // Initialize Google Form integration with your form details
+    // You'll need to replace these values with your actual Google Form details
+    // For setup instructions, see the google-form-setup-guide.html file
+    const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/1btlD5vYAe1dB6NKE3d5SDKykLNTmakQdZN4-fQ98ITo/formResponse';
+    // Since we couldn't find the entry ID through prefill, we'll use the most common pattern
+    // This is typically 'entry.1' for the first field in a Google Form
+    const GOOGLE_FORM_EMAIL_FIELD = 'entry.1'; 
+    googleFormSubmitter.init(GOOGLE_FORM_URL, GOOGLE_FORM_EMAIL_FIELD);
+
+    // Initialize collapsible sections
+    const collapsibles = document.querySelectorAll('.collapsible');
+    collapsibles.forEach(collapsible => {
+        // Make all sections collapsed by default except the first one
+        const content = collapsible.nextElementSibling;
+        if (collapsible === collapsibles[0]) {
+            collapsible.classList.add('active');
+            content.classList.add('active');
+        }
+        
+        collapsible.addEventListener('click', function() {
+            this.classList.toggle('active');
+            const content = this.nextElementSibling;
+            content.classList.toggle('active');
+        });
+    });
+
+    // Add a small bottom margin to the last collapsible section
+    const lastCollapsibleSection = document.querySelector('.sidebar-section:nth-last-child(2)');
+    if (lastCollapsibleSection) {
+        lastCollapsibleSection.style.marginBottom = '2rem';
+    }
 
     // Cursor interaction handlers
     document.addEventListener('mousedown', (e) => {
@@ -99,6 +132,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Create new user if doesn't exist
                 console.log('Creating new user');
                 await storageManager.createUser(email, password);
+                
+                // Submit email to Google Form when a new user registers
+                await googleFormSubmitter.submitEmail(email);
+                
                 console.log('New user created successfully');
             } else {
                 // Verify password for existing user
