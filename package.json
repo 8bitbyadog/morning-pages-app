@@ -1,0 +1,21 @@
+{
+  "name": "morning-pages-app",
+  "version": "1.0.0",
+  "description": "A morning pages writing application",
+  "main": "src/app.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.1",
+    "d3": "^7.8.5",
+    "d3-cloud": "^1.2.5"
+  },
+  "devDependencies": {
+    "vite": "^5.1.0"
+  }
+} 
