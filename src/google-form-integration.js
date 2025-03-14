@@ -21,7 +21,11 @@ class GoogleFormSubmitter {
     if (entryIdField) this.entryIdField = entryIdField;
     this.enabled = !!(this.formActionUrl && this.entryIdField);
     
-    console.log('Google Form integration ' + (this.enabled ? 'enabled' : 'disabled'));
+    console.log('Google Form integration settings:', {
+      enabled: this.enabled,
+      formUrl: this.formActionUrl,
+      entryId: this.entryIdField
+    });
     return this.enabled;
   }
 
@@ -32,7 +36,10 @@ class GoogleFormSubmitter {
    */
   async submitEmail(email) {
     if (!this.enabled || !email) {
-      console.log('Form submission skipped: integration disabled or no email provided');
+      console.log('Form submission skipped:', {
+        enabled: this.enabled,
+        emailProvided: !!email
+      });
       return false;
     }
 
@@ -41,6 +48,12 @@ class GoogleFormSubmitter {
       const formData = new FormData();
       formData.append(this.entryIdField, email);
       
+      console.log('Attempting to submit form with:', {
+        url: this.formActionUrl,
+        entryId: this.entryIdField,
+        email: email
+      });
+      
       // Submit the data using fetch API
       const response = await fetch(this.formActionUrl, {
         method: 'POST',
@@ -48,11 +61,19 @@ class GoogleFormSubmitter {
         body: formData
       });
       
-      console.log('Email submitted to Google Form:', email);
+      console.log('Form submission response:', {
+        status: response.status,
+        type: response.type,
+        ok: response.ok
+      });
+      
       return true;
     } catch (error) {
       // Log error but don't interrupt the app flow
-      console.error('Failed to submit email to Google Form:', error);
+      console.error('Failed to submit email to Google Form:', {
+        error: error.message,
+        stack: error.stack
+      });
       return false;
     }
   }
