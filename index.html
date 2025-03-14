@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morning Pages App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jasondavies/d3-cloud/build/d3.layout.cloud.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" crossorigin src="/assets/index-dlIFG3UK.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-SMldBAzK.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <button class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+            <span>Menu</span>
+        </button>
+        
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3>Core Principles</h3>
+                <ul>
+                    <li>🎯 Morning Pages (3 pages daily)</li>
+                    <li>🎨 Artist's Date (weekly)</li>
+                    <li>👥 Walking (20 minutes)</li>
+                    <li>📝 Creative Recovery</li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Creative Affirmations</h3>
+                <ul>
+                    <li>✨ I am a channel for creativity</li>
+                    <li>🌟 My creativity flows freely</li>
+                    <li>💫 I trust my creative process</li>
+                    <li>⭐ I am open to inspiration</li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Connect</h3>
+                <div class="social-links">
+                    <a href="https://www.8bitbyadog.com" target="_blank" title="Website">
+                        <i class="fas fa-globe"></i>
+                    </a>
+                    <a href="https://github.com/8bitbyadog" target="_blank" title="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://instagram.com/spirit.mango" target="_blank" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="mailto:8bitbyadog@gmail.com" title="Email">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Login Form -->
+            <div class="login-container" id="login-container">
+                <h2>Welcome to Morning Pages</h2>
+                <form class="login-form" id="login-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <button type="submit" class="login-button">Login / Sign Up</button>
+                </form>
+            </div>
+
+            <!-- App Content (hidden until logged in) -->
+            <div id="app-content" style="display: none;">
+                <header>
+                    <h1>Morning Pages</h1>
+                    <div class="stats-summary">
+                        <div class="stat-item">
+                            <span id="streak-count">🔥 0 day streak</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="total-words">📝 0 total words</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="avg-pace">⚡ 0 wpm</span>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="editor-container">
+                    <div class="word-counter">
+                        <span id="word-count">0 words</span>
+                        <div id="progress-bar">
+                            <div id="progress-bar-fill"></div>
+                        </div>
+                    </div>
+                    <textarea id="text-editor" placeholder="Start writing your morning pages..."></textarea>
+                </div>
+
+                <div class="analysis-container">
+                    <h2>Writing Analysis</h2>
+                    <div class="analysis-grid">
+                        <div class="analysis-card">
+                            <h3>Emotions</h3>
+                            <div class="chart-container">
+                                <canvas id="emotions-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="analysis-card">
+                            <h3>Topics</h3>
+                            <div class="chart-container">
+                                <canvas id="topics-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="analysis-card">
+                            <h3>Writing Speed</h3>
+                            <div class="chart-container">
+                                <canvas id="speed-graph"></canvas>
+                            </div>
+                        </div>
+                        <div class="analysis-card">
+                            <h3>Keywords</h3>
+                            <div class="keyword-cloud" id="keyword-cloud"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="celebration-container" id="celebration-container">
+        <div class="congrats-message">
+            <h2>🎉 Congratulations! 🎉</h2>
+            <p>You've reached your daily goal!</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jasondavies/d3-cloud/build/d3.layout.cloud.js"></script>
+</body>
+</html> 
