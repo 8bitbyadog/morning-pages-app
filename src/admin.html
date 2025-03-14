@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morning Pages Admin</title>
+    <style>
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent-color: #00ff9d;
+            --border-color: #404040;
+            --card-bg: #2d2d2d;
+            --card-border: #404040;
+            --card-shadow: rgba(0, 0, 0, 0.2);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        
+        .admin-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        header {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px var(--card-shadow);
+        }
+        
+        .card h2 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        .stats-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-box {
+            flex: 1;
+            background-color: var(--bg-primary);
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            background-color: var(--bg-primary);
+            color: var(--text-secondary);
+            font-weight: normal;
+        }
+        
+        button {
+            background-color: var(--accent-color);
+            color: var(--bg-primary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid var(--text-secondary);
+            border-radius: 50%;
+            border-top-color: var(--accent-color);
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .message {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+        .message.success {
+            background-color: rgba(0, 255, 157, 0.1);
+            border: 1px solid var(--accent-color);
+        }
+        
+        .message.error {
+            background-color: rgba(255, 99, 71, 0.1);
+            border: 1px solid #ff6347;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <header>
+            <h1>Morning Pages Admin Panel</h1>
+            <p>Manage user data and view statistics</p>
+        </header>
+        
+        <div class="card">
+            <h2>User Statistics</h2>
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-value" id="total-users">-</div>
+                    <div class="stat-label">Registered Users</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="active-users">-</div>
+                    <div class="stat-label">Active Users (Last 30 Days)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="new-users">-</div>
+                    <div class="stat-label">New Users (Last 30 Days)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>User List</h2>
+            <div id="message-container"></div>
+            <div class="actions">
+                <button id="refresh-btn">Refresh Data</button>
+                <button id="export-btn">Export as CSV</button>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Created At</th>
+                        <th>Last Login</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table-body">
+                    <tr>
+                        <td colspan="3" style="text-align: center;">Loading user data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        import StorageManager from './storage-manager.js';
+        
+        // Initialize the StorageManager
+        const storageManager = new StorageManager();
+        
+        // DOM Elements
+        const totalUsersElement = document.getElementById('total-users');
+        const activeUsersElement = document.getElementById('active-users');
+        const newUsersElement = document.getElementById('new-users');
+        const usersTableBody = document.getElementById('users-table-body');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const exportBtn = document.getElementById('export-btn');
+        const messageContainer = document.getElementById('message-container');
+        
+        // Format date to a readable format
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            return date.toLocaleString();
+        }
+        
+        // Show a message to the user
+        function showMessage(message, type = 'success') {
+            messageContainer.innerHTML = `
+                <div class="message ${type}">
+                    ${message}
+                </div>
+            `;
+            setTimeout(() => {
+                messageContainer.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Load user data
+        async function loadUserData() {
+            try {
+                usersTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="3" style="text-align: center;">
+                            <span class="loading-spinner"></span> Loading user data...
+                        </td>
+                    </tr>
+                `;
+                
+                // Get all users
+                const users = await storageManager.getAllUsers();
+                
+                // Update stats
+                totalUsersElement.textContent = users.length;
+                
+                // Calculate active and new users (last 30 days)
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                
+                const activeUsers = users.filter(user => 
+                    new Date(user.lastLogin) > thirtyDaysAgo
+                );
+                
+                const newUsers = users.filter(user => 
+                    new Date(user.createdAt) > thirtyDaysAgo
+                );
+                
+                activeUsersElement.textContent = activeUsers.length;
+                newUsersElement.textContent = newUsers.length;
+                
+                // Clear and populate the table
+                usersTableBody.innerHTML = '';
+                
+                if (users.length === 0) {
+                    usersTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="3" style="text-align: center;">No users found</td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                // Sort users by created date (newest first)
+                users.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.email}</td>
+                        <td>${formatDate(user.createdAt)}</td>
+                        <td>${formatDate(user.lastLogin)}</td>
+                    `;
+                    usersTableBody.appendChild(row);
+                });
+                
+                showMessage(`Successfully loaded ${users.length} users`);
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                usersTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="3" style="text-align: center;">
+                            Error loading user data. Please try again.
+                        </td>
+                    </tr>
+                `;
+                showMessage('Failed to load user data: ' + error.message, 'error');
+            }
+        }
+        
+        // Export user data as CSV
+        function exportUserData() {
+            try {
+                const users = Array.from(document.querySelectorAll('#users-table-body tr')).map(row => {
+                    const cells = Array.from(row.querySelectorAll('td'));
+                    if (cells.length < 3) return null;
+                    return {
+                        email: cells[0].textContent,
+                        createdAt: cells[1].textContent,
+                        lastLogin: cells[2].textContent
+                    };
+                }).filter(Boolean);
+                
+                if (users.length === 0) {
+                    showMessage('No user data to export', 'error');
+                    return;
+                }
+                
+                // Generate CSV content
+                const csvHeaders = ['Email', 'Created At', 'Last Login'];
+                const csvRows = [
+                    csvHeaders.join(','),
+                    ...users.map(user => [
+                        `"${user.email}"`,
+                        `"${user.createdAt}"`,
+                        `"${user.lastLogin}"`
+                    ].join(','))
+                ];
+                
+                const csvContent = csvRows.join('\n');
+                
+                // Create and download the CSV file
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', `morning-pages-users-${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showMessage('User data exported successfully');
+            } catch (error) {
+                console.error('Error exporting user data:', error);
+                showMessage('Failed to export user data: ' + error.message, 'error');
+            }
+        }
+        
+        // Event listeners
+        refreshBtn.addEventListener('click', loadUserData);
+        exportBtn.addEventListener('click', exportUserData);
+        
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', loadUserData);
+    </script>
+</body>
+</html> 
