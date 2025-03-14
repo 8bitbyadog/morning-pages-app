@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morning Pages</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Morning Pages</h1>
+            <div class="stats-summary">
+                <span id="streak-count">Streak: 0 days</span>
+                <span id="total-words">Total words: 0</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="editor-container">
+                <div class="word-counter">
+                    <span id="word-count">0</span>
+                    <span>/ 750 words</span>
+                    <div id="progress-bar">
+                        <div id="progress"></div>
+                    </div>
+                </div>
+                <textarea id="text-editor" placeholder="Start typing your morning pages here..."></textarea>
+            </div>
+
+            <div class="analysis-container" id="analysis-section" style="display: none;">
+                <h2>Your Writing Analysis</h2>
+                <div class="analysis-grid">
+                    <div class="analysis-card">
+                        <h3>Emotions</h3>
+                        <div id="emotions-chart" class="chart"></div>
+                        <div id="emotions-summary"></div>
+                    </div>
+                    <div class="analysis-card">
+                        <h3>Topics</h3>
+                        <div id="topics-chart" class="chart"></div>
+                        <div id="topics-summary"></div>
+                    </div>
+                    <div class="analysis-card">
+                        <h3>Writing Pace</h3>
+                        <div id="pace-chart" class="chart"></div>
+                        <div id="pace-summary"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="celebration-container" class="celebration-container">
+            <!-- Animations will be added here when 750 words are reached -->
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html> 
