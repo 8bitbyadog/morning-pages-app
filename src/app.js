@@ -22,6 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Add a small bottom margin to the last collapsible section
+    const lastCollapsibleSection = document.querySelector('.sidebar-section:nth-last-child(2)');
+    if (lastCollapsibleSection) {
+        lastCollapsibleSection.style.marginBottom = '2rem';
+    }
+
     // Cursor interaction handlers
     document.addEventListener('mousedown', (e) => {
         if (e.button === 0) { // Left click
