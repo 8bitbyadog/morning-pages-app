@@ -5,6 +5,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize StorageManager
     const storageManager = new StorageManager();
 
+    // Initialize collapsible sections
+    const collapsibles = document.querySelectorAll('.collapsible');
+    collapsibles.forEach(collapsible => {
+        // Make all sections collapsed by default except the first one
+        const content = collapsible.nextElementSibling;
+        if (collapsible === collapsibles[0]) {
+            collapsible.classList.add('active');
+            content.classList.add('active');
+        }
+        
+        collapsible.addEventListener('click', function() {
+            this.classList.toggle('active');
+            const content = this.nextElementSibling;
+            content.classList.toggle('active');
+        });
+    });
+
     // Cursor interaction handlers
     document.addEventListener('mousedown', (e) => {
         if (e.button === 0) { // Left click

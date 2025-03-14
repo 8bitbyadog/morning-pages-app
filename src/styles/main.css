@@ -786,4 +786,37 @@ input:focus {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Collapsible Sidebar Sections */
+.collapsible {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.3s;
+}
+
+.collapsible:hover {
+  color: var(--accent-color);
+}
+
+.collapsible i {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+.collapsible.active i {
+  transform: rotate(180deg);
+}
+
+.collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.collapsible-content.active {
+  max-height: 1000px; /* Adjust based on content size */
+  transition: max-height 0.6s ease;
 } 
