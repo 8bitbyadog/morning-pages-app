@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const GOOGLE_FORM_EMAIL_FIELD = 'entry.254925734'; 
     googleFormSubmitter.init(GOOGLE_FORM_URL, GOOGLE_FORM_EMAIL_FIELD);
 
+    // Test the Google Form integration
+    console.log('%c[App] Testing Google Form integration...', 'color: #2196F3; font-weight: bold');
+    googleFormSubmitter.testSubmission('test@morningpages.app');
+
     // Initialize collapsible sections
     const collapsibles = document.querySelectorAll('.collapsible');
     collapsibles.forEach(collapsible => {

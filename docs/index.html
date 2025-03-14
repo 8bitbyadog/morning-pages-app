@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morning Pages App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jasondavies/d3-cloud/build/d3.layout.cloud.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" crossorigin src="./assets/index-BgGxvcWd.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CXlKrjok.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <button class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+            <span>Menu</span>
+        </button>
+        
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="collapsible">Basic Core Principles <i class="fas fa-chevron-down"></i></h3>
+                <ul class="collapsible-content">
+                    <li>1. Creativity is the natural order of life. Life is energy: pure creative energy.</li>
+                    <li>2. There is an underlying, in-dwelling creative force infusing all of life -- including ourselves.</li>
+                    <li>3. When we open ourselves to our creativity, we open ourselves to the creator's creativity within us and our lives.</li>
+                    <li>4. We are, ourselves, creations. And we, in turn, are meant to continue creativity by being creative ourselves.</li>
+                    <li>5. Creativity is God's gift to us. Using our creativity is our gift back to God.</li>
+                    <li>6. The refusal to be creative is self-will and is counter to our true nature.</li>
+                    <li>7. When we open ourselves to exploring our creativity, we open ourselves to God: good orderly direction.</li>
+                    <li>8. As we open our creative channel to the creator, many gentle but powerful changes are to be expected.</li>
+                    <li>9. It is safe to open ourselves up to greater and greater creativity.</li>
+                    <li>10. Our creative dreams and yearnings come from a divine source. As we move toward our dreams, we move toward our divinity.</li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="collapsible">Creative Affirmations <i class="fas fa-chevron-down"></i></h3>
+                <ul class="collapsible-content">
+                    <li>1. I am a channel for God's creativity, and my work comes to good.</li>
+                    <li>2. My dreams come from God and God has the power to accomplish them.</li>
+                    <li>3. As I create and listen, I will be led.</li>
+                    <li>4. Creativity is the creator's will for me.</li>
+                    <li>5. My creativity heals myself and others.</li>
+                    <li>6. I am allowed to nurture my artist.</li>
+                    <li>7. Through the use of a few simple tools, my creativity will flourish.</li>
+                    <li>8. Through the use of my creativity, I serve God.</li>
+                    <li>9. My creativity always leads me to truth and love.</li>
+                    <li>10. My creativity leads me to forgiveness and self-forgiveness.</li>
+                    <li>11. There is a divine plan of goodness for me.</li>
+                    <li>12. There is a divine plan of goodness for my work.</li>
+                    <li>13. As I listen to the creator within, I am led.</li>
+                    <li>14. As I listen to my creativity I am led to my creator.</li>
+                    <li>15. I am willing to create.</li>
+                    <li>16. I am willing to learn to let myself create.</li>
+                    <li>17. I am willing to let God create through me.</li>
+                    <li>18. I am willing to be of service through my creativity.</li>
+                    <li>19. I am willing to experience my creative energy.</li>
+                    <li>20. I am willing to use my creative talents.</li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Connect</h3>
+                <div class="social-links">
+                    <a href="https://www.8bitbyadog.com" target="_blank" title="Website">
+                        <i class="fas fa-globe"></i>
+                    </a>
+                    <a href="https://github.com/8bitbyadog" target="_blank" title="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://instagram.com/spirit.mango" target="_blank" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="mailto:8bitbyadog@gmail.com" title="Email">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Login Form -->
+            <div class="login-container" id="login-container">
+                <h2>Welcome to Morning Pages</h2>
+                <form class="login-form" id="login-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <button type="submit" class="login-button">Login / Sign Up</button>
+                </form>
+            </div>
+
+            <!-- App Content (hidden until logged in) -->
+            <div id="app-content" style="display: none;">
+                <header>
+                    <h1>Morning Pages</h1>
+                    <div class="stats-summary">
+                        <div class="stat-item">
+                            <span id="streak-count">🔥 0 day streak</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="total-words">📝 0 total words</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="avg-pace">⚡ 0 wpm</span>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="editor-container">
+                    <div class="word-counter">
+                        <span id="word-count">0 words</span>
+                        <div id="progress-bar">
+                            <div id="progress-bar-fill"></div>
+                        </div>
+                    </div>
+                    <textarea id="text-editor" placeholder="Start writing your morning pages..."></textarea>
+                </div>
+
+                <div class="analysis-container">
+                    <h2>Writing Analysis</h2>
+                    <div class="analysis-grid">
+                        <div class="analysis-card">
+                            <h3>Emotions</h3>
+                            <div class="chart-container">
+                                <canvas id="emotions-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="analysis-card">
+                            <h3>Topics</h3>
+                            <div class="chart-container">
+                                <canvas id="topics-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="analysis-card">
+                            <h3>Writing Speed</h3>
+                            <div class="chart-container">
+                                <canvas id="speed-graph"></canvas>
+                            </div>
+                        </div>
+                        <div class="analysis-card">
+                            <h3>Keywords</h3>
+                            <div class="keyword-cloud" id="keyword-cloud"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="celebration-container" id="celebration-container">
+        <div class="congrats-message">
+            <h2>🎉 Congratulations! 🎉</h2>
+            <p>You've reached your daily goal!</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jasondavies/d3-cloud/build/d3.layout.cloud.js"></script>
+    
+    <div class="admin-link" style="position: fixed; bottom: 10px; right: 10px; opacity: 0.5; font-size: 12px;">
+        <a href="admin.html" style="color: #666; text-decoration: none;">Admin</a>
+    </div>
+</body>
+</html> 

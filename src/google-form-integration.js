@@ -21,7 +21,7 @@ class GoogleFormSubmitter {
     if (entryIdField) this.entryIdField = entryIdField;
     this.enabled = !!(this.formActionUrl && this.entryIdField);
     
-    console.log('Google Form integration settings:', {
+    console.log('%c[Google Form] Integration initialized:', 'color: #4CAF50; font-weight: bold', {
       enabled: this.enabled,
       formUrl: this.formActionUrl,
       entryId: this.entryIdField
@@ -36,7 +36,7 @@ class GoogleFormSubmitter {
    */
   async submitEmail(email) {
     if (!this.enabled || !email) {
-      console.log('Form submission skipped:', {
+      console.log('%c[Google Form] Submission skipped:', 'color: #FFA500; font-weight: bold', {
         enabled: this.enabled,
         emailProvided: !!email
       });
@@ -48,7 +48,7 @@ class GoogleFormSubmitter {
       const formData = new FormData();
       formData.append(this.entryIdField, email);
       
-      console.log('Attempting to submit form with:', {
+      console.log('%c[Google Form] Attempting submission:', 'color: #2196F3; font-weight: bold', {
         url: this.formActionUrl,
         entryId: this.entryIdField,
         email: email
@@ -61,7 +61,7 @@ class GoogleFormSubmitter {
         body: formData
       });
       
-      console.log('Form submission response:', {
+      console.log('%c[Google Form] Submission response:', 'color: #4CAF50; font-weight: bold', {
         status: response.status,
         type: response.type,
         ok: response.ok
@@ -70,7 +70,51 @@ class GoogleFormSubmitter {
       return true;
     } catch (error) {
       // Log error but don't interrupt the app flow
-      console.error('Failed to submit email to Google Form:', {
+      console.error('%c[Google Form] Submission failed:', 'color: #f44336; font-weight: bold', {
+        error: error.message,
+        stack: error.stack
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Test the Google Form submission
+   * @param {String} testEmail - The test email to submit
+   */
+  async testSubmission(testEmail = 'test@example.com') {
+    console.log('%c[Google Form] Starting test submission...', 'color: #2196F3; font-weight: bold');
+    
+    if (!this.enabled) {
+      console.log('%c[Google Form] Test failed: Integration not enabled', 'color: #f44336; font-weight: bold');
+      return false;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append(this.entryIdField, testEmail);
+      
+      console.log('%c[Google Form] Test submission data:', 'color: #2196F3; font-weight: bold', {
+        url: this.formActionUrl,
+        entryId: this.entryIdField,
+        email: testEmail
+      });
+      
+      const response = await fetch(this.formActionUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: formData
+      });
+      
+      console.log('%c[Google Form] Test submission response:', 'color: #4CAF50; font-weight: bold', {
+        status: response.status,
+        type: response.type,
+        ok: response.ok
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('%c[Google Form] Test submission failed:', 'color: #f44336; font-weight: bold', {
         error: error.message,
         stack: error.stack
       });
