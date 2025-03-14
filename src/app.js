@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // You'll need to replace these values with your actual Google Form details
     // For setup instructions, see the google-form-setup-guide.html file
     const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/1btlD5vYAe1dB6NKE3d5SDKykLNTmakQdZN4-fQ98ITo/formResponse';
-    // Since we couldn't find the entry ID through prefill, we'll use the most common pattern
-    // This is typically 'entry.1' for the first field in a Google Form
-    const GOOGLE_FORM_EMAIL_FIELD = 'entry.1'; 
+    // The entry ID might be different - let's try a common alternative
+    const GOOGLE_FORM_EMAIL_FIELD = 'entry.254925734'; 
+    console.log('Initializing Google Form integration with:', GOOGLE_FORM_URL, GOOGLE_FORM_EMAIL_FIELD);
     googleFormSubmitter.init(GOOGLE_FORM_URL, GOOGLE_FORM_EMAIL_FIELD);
 
     // Initialize collapsible sections

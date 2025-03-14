@@ -22,6 +22,8 @@ class GoogleFormSubmitter {
     this.enabled = !!(this.formActionUrl && this.entryIdField);
     
     console.log('Google Form integration ' + (this.enabled ? 'enabled' : 'disabled'));
+    console.log('Form URL:', this.formActionUrl);
+    console.log('Entry ID field:', this.entryIdField);
     return this.enabled;
   }
 
@@ -36,18 +38,26 @@ class GoogleFormSubmitter {
       return false;
     }
 
+    console.log('Preparing to submit email to Google Form:', email);
+    console.log('Form URL:', this.formActionUrl);
+    console.log('Entry ID field:', this.entryIdField);
+
     try {
       // Create form data for the request
       const formData = new FormData();
       formData.append(this.entryIdField, email);
       
+      console.log('FormData created:', this.entryIdField, '=', email);
+      
       // Submit the data using fetch API
+      console.log('Submitting form data to:', this.formActionUrl);
       const response = await fetch(this.formActionUrl, {
         method: 'POST',
         mode: 'no-cors', // This is important for cross-origin requests to Google Forms
         body: formData
       });
       
+      console.log('Form submission response received, no-cors mode so details limited');
       console.log('Email submitted to Google Form:', email);
       return true;
     } catch (error) {
