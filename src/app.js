@@ -10,13 +10,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // You'll need to replace these values with your actual Google Form details
     // For setup instructions, see the google-form-setup-guide.html file
     const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/1btlD5vYAe1dB6NKE3d5SDKykLNTmakQdZN4-fQ98ITo/formResponse';
-    // Try a different entry ID pattern that's more commonly used in Google Forms
-    const GOOGLE_FORM_EMAIL_FIELD = 'entry.254925734'; 
-    googleFormSubmitter.init(GOOGLE_FORM_URL, GOOGLE_FORM_EMAIL_FIELD);
+    const GOOGLE_FORM_EMAIL_FIELD = 'entry.254925734';
 
-    // Test the Google Form integration
-    console.log('%c[App] Testing Google Form integration...', 'color: #2196F3; font-weight: bold');
-    googleFormSubmitter.testSubmission('test@morningpages.app');
+    console.log('Initializing Google Form integration with:', {
+        url: GOOGLE_FORM_URL,
+        entryId: GOOGLE_FORM_EMAIL_FIELD
+    });
+
+    const formInitialized = googleFormSubmitter.init(GOOGLE_FORM_URL, GOOGLE_FORM_EMAIL_FIELD);
+    console.log('Google Form initialization result:', formInitialized);
+
+    // Test the Google Form integration immediately
+    googleFormSubmitter.testSubmission('test@morningpages.app').then(result => {
+        console.log('Google Form test submission result:', result);
+    }).catch(error => {
+        console.error('Google Form test submission error:', error);
+    });
 
     // Initialize collapsible sections
     const collapsibles = document.querySelectorAll('.collapsible');
@@ -137,7 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 await storageManager.createUser(email, password);
                 
                 // Submit email to Google Form when a new user registers
-                await googleFormSubmitter.submitEmail(email);
+                console.log('Submitting new user email to Google Form:', email);
+                const submitted = await googleFormSubmitter.submitEmail(email);
+                console.log('Google Form submission result:', submitted);
                 
                 console.log('New user created successfully');
             } else {
