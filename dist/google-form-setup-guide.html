@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Form Setup Guide - Morning Pages App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: monospace;
+            background: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        ol li, ul li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Google Form Setup Guide for Morning Pages App</h1>
+    
+    <p>This guide will help you set up a Google Form to collect email addresses from users who register in your Morning Pages App.</p>
+    
+    <h2>Step 1: Create a New Google Form</h2>
+    <ol>
+        <li>Go to <a href="https://docs.google.com/forms" target="_blank">Google Forms</a> (make sure you're signed in to your Google account)</li>
+        <li>Click on the "+" icon to create a new blank form</li>
+        <li>Give your form a title, such as "Morning Pages User Registration"</li>
+        <li>Add a description if desired (e.g., "Email collection for Morning Pages App")</li>
+    </ol>
+    
+    <h2>Step 2: Add an Email Question</h2>
+    <ol>
+        <li>Click on "Untitled Question" and rename it to "Email Address"</li>
+        <li>Choose "Short answer" as the question type</li>
+        <li>Check the "Required" toggle if you want to make this field mandatory</li>
+        <li>Under "Answer validation", select "Email" to ensure users enter valid email addresses</li>
+    </ol>
+    
+    <h2>Step 3: Get the Form URL and Entry ID</h2>
+    <ol>
+        <li>Click the "Send" button at the top right</li>
+        <li>In the pop-up window, click the link icon to get the form URL</li>
+        <li>Copy this URL and set it aside for now</li>
+        <li>Close the "Send form" dialog</li>
+        <li>Now click the three vertical dots (⋮) in the top right corner and select "Get pre-filled link"</li>
+        <li>Enter any test email (like "test@example.com") in the field and click "Get link"</li>
+        <li>Copy the generated URL, which will look something like:<br>
+            <code>https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform?usp=pp_url&entry.XXXXXXXXXX=test%40example.com</code></li>
+        <li>Look for the parameter that starts with <code>entry.</code> followed by numbers (like <code>entry.1234567890</code>) - this full parameter name is your Entry ID</li>
+    </ol>
+    
+    <div class="note">
+        <p><strong>Example:</strong> If your pre-filled URL contains <code>entry.1487986123=test%40example.com</code>, then your Entry ID is <code>entry.1487986123</code></p>
+    </div>
+    
+    <h2>Step 4: Update the Morning Pages App</h2>
+    <ol>
+        <li>Open the <code>src/app.js</code> file in your code editor</li>
+        <li>Locate the following lines (around line 15-20):
+            <pre>
+// Initialize Google Form integration with your form details
+// You'll need to replace these values with your actual Google Form details
+const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/formResponse';
+const GOOGLE_FORM_EMAIL_FIELD = 'entry.123456789'; // Replace with your actual entry ID
+googleFormSubmitter.init(GOOGLE_FORM_URL, GOOGLE_FORM_EMAIL_FIELD);</pre>
+        </li>
+        <li>Replace <code>'https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/formResponse'</code> with the URL of your form, but change the last part from <code>/viewform</code> to <code>/formResponse</code></li>
+        <li>Replace <code>'entry.123456789'</code> with the Entry ID you found in Step 3</li>
+        <li>Save the file</li>
+    </ol>
+    
+    <h2>Step 5: Build and Deploy</h2>
+    <ol>
+        <li>Run <code>npm run build</code> to build the project</li>
+        <li>Deploy the updated files to your hosting platform</li>
+    </ol>
+    
+    <h2>Step 6: View Collected Emails</h2>
+    <ol>
+        <li>Go back to your Google Form in edit mode</li>
+        <li>Click the "Responses" tab at the top</li>
+        <li>You'll see a summary of all responses</li>
+        <li>Click on the Google Sheets icon to create a spreadsheet with all the responses</li>
+    </ol>
+    
+    <div class="note">
+        <p><strong>Important Note:</strong> This implementation uses a client-side approach to submit data to Google Forms. While it works for most cases, there are a few limitations:</p>
+        <ul>
+            <li>Google may change their form submission process in the future</li>
+            <li>Some browsers might block these submissions due to CORS restrictions</li>
+            <li>This approach doesn't provide confirmation that the submission was successful</li>
+        </ul>
+        <p>For a more robust solution, consider implementing a server-side component or using a dedicated email collection service.</p>
+    </div>
+    
+    <p><a href="index.html">← Back to Morning Pages App</a></p>
+</body>
+</html> 
