@@ -12,19 +12,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/1btlD5vYAe1dB6NKE3d5SDKykLNTmakQdZN4-fQ98ITo/formResponse';
     const GOOGLE_FORM_EMAIL_FIELD = 'entry.254925734';
 
-    console.log('Initializing Google Form integration with:', {
+    console.log('%c[Google Form] Starting initialization...', 'color: #4CAF50; font-weight: bold;');
+    console.log('%c[Google Form] Configuration:', 'color: #4CAF50;', {
         url: GOOGLE_FORM_URL,
         entryId: GOOGLE_FORM_EMAIL_FIELD
     });
 
     const formInitialized = googleFormSubmitter.init(GOOGLE_FORM_URL, GOOGLE_FORM_EMAIL_FIELD);
-    console.log('Google Form initialization result:', formInitialized);
+    console.log('%c[Google Form] Initialization result:', 'color: #4CAF50;', formInitialized);
 
     // Test the Google Form integration immediately
+    console.log('%c[Google Form] Running test submission...', 'color: #4CAF50;');
     googleFormSubmitter.testSubmission('test@morningpages.app').then(result => {
-        console.log('Google Form test submission result:', result);
+        console.log('%c[Google Form] Test submission result:', 'color: #4CAF50;', result);
     }).catch(error => {
-        console.error('Google Form test submission error:', error);
+        console.error('%c[Google Form] Test submission error:', 'color: #FF5252;', error);
     });
 
     // Initialize collapsible sections

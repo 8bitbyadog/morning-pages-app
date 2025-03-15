@@ -9,7 +9,7 @@ class GoogleFormSubmitter {
     this.formActionUrl = formActionUrl;
     this.entryIdField = 'entry.123456789';
     this.enabled = false;
-    console.log('GoogleFormSubmitter instance created');
+    console.log('%c[Google Form] Instance created', 'color: #4CAF50; font-weight: bold;');
   }
 
   /**
@@ -18,7 +18,7 @@ class GoogleFormSubmitter {
    * @param {String} entryIdField - The entry ID for the email field in your form
    */
   init(formActionUrl, entryIdField) {
-    console.log('Initializing GoogleFormSubmitter with:', {
+    console.log('%c[Google Form] Initializing with:', 'color: #4CAF50; font-weight: bold;', {
       formActionUrl,
       entryIdField
     });
@@ -28,7 +28,7 @@ class GoogleFormSubmitter {
     
     this.enabled = !!(this.formActionUrl && this.entryIdField);
     
-    console.log('GoogleFormSubmitter initialization complete:', {
+    console.log('%c[Google Form] Initialization complete:', 'color: #4CAF50;', {
       enabled: this.enabled,
       formUrl: this.formActionUrl,
       entryId: this.entryIdField
@@ -43,10 +43,10 @@ class GoogleFormSubmitter {
    * @returns {Promise} - Resolves when submission is complete
    */
   async submitEmail(email) {
-    console.log('submitEmail called with:', email);
+    console.log('%c[Google Form] Submitting email:', 'color: #4CAF50; font-weight: bold;', email);
 
     if (!this.enabled || !email) {
-      console.warn('Form submission skipped:', {
+      console.warn('%c[Google Form] Submission skipped:', 'color: #FFA000;', {
         enabled: this.enabled,
         emailProvided: !!email
       });
@@ -61,13 +61,13 @@ class GoogleFormSubmitter {
       
       const submissionUrl = `${this.formActionUrl}?${params.toString()}`;
       
-      console.log('Attempting form submission with URL:', submissionUrl);
+      console.log('%c[Google Form] Submitting to URL:', 'color: #4CAF50;', submissionUrl);
 
       // First, try to validate the form URL
       try {
         new URL(submissionUrl);
       } catch (urlError) {
-        console.error('Invalid form URL:', submissionUrl);
+        console.error('%c[Google Form] Invalid URL:', 'color: #FF5252;', submissionUrl);
         return false;
       }
       
@@ -79,7 +79,7 @@ class GoogleFormSubmitter {
         }
       });
       
-      console.log('Form submission response:', {
+      console.log('%c[Google Form] Submission response:', 'color: #4CAF50;', {
         status: response.status,
         type: response.type,
         ok: response.ok
@@ -87,7 +87,7 @@ class GoogleFormSubmitter {
       
       return true;
     } catch (error) {
-      console.error('Form submission failed:', {
+      console.error('%c[Google Form] Submission failed:', 'color: #FF5252;', {
         error: error.message,
         stack: error.stack
       });
@@ -100,10 +100,10 @@ class GoogleFormSubmitter {
    * @param {String} testEmail - The test email to submit
    */
   async testSubmission(testEmail = 'test@example.com') {
-    console.log('Starting test submission...');
+    console.log('%c[Google Form] Starting test submission...', 'color: #4CAF50; font-weight: bold;');
     
     if (!this.enabled) {
-      console.error('Test failed: Integration not enabled');
+      console.error('%c[Google Form] Test failed: Integration not enabled', 'color: #FF5252;');
       return false;
     }
 
@@ -115,7 +115,7 @@ class GoogleFormSubmitter {
       
       const submissionUrl = `${this.formActionUrl}?${params.toString()}`;
       
-      console.log('Test submission URL:', submissionUrl);
+      console.log('%c[Google Form] Test submission URL:', 'color: #4CAF50;', submissionUrl);
       
       const response = await fetch(submissionUrl, {
         method: 'GET',
@@ -125,7 +125,7 @@ class GoogleFormSubmitter {
         }
       });
       
-      console.log('Test submission response:', {
+      console.log('%c[Google Form] Test submission response:', 'color: #4CAF50;', {
         status: response.status,
         type: response.type,
         ok: response.ok
@@ -133,7 +133,7 @@ class GoogleFormSubmitter {
       
       return true;
     } catch (error) {
-      console.error('Test submission failed:', {
+      console.error('%c[Google Form] Test submission failed:', 'color: #FF5252;', {
         error: error.message,
         stack: error.stack
       });
@@ -144,5 +144,5 @@ class GoogleFormSubmitter {
 
 // Create and export a single instance
 const googleFormSubmitter = new GoogleFormSubmitter();
-console.log('GoogleFormSubmitter instance exported');
+console.log('%c[Google Form] Instance exported', 'color: #4CAF50; font-weight: bold;');
 export default googleFormSubmitter;
