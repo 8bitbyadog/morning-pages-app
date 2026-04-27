@@ -838,6 +838,16 @@ input:focus {
   color: #1a1a1a;
 }
 
+.download-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.celebration-download-group {
+  justify-content: center;
+}
+
 .celebration-download {
   margin-top: 1rem;
   font-size: 0.9rem;
