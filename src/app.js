@@ -1,33 +1,9 @@
 // Import StorageManager
 import StorageManager from './storage-manager.js';
-import googleFormSubmitter from './google-form-integration.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize StorageManager
     const storageManager = new StorageManager();
-
-    // Initialize Google Form integration with your form details
-    // You'll need to replace these values with your actual Google Form details
-    // For setup instructions, see the google-form-setup-guide.html file
-    const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/1btlD5vYAe1dB6NKE3d5SDKykLNTmakQdZN4-fQ98ITo/formResponse';
-    const GOOGLE_FORM_EMAIL_FIELD = 'entry.254925734';
-
-    console.log('%c[Google Form] Starting initialization...', 'color: #4CAF50; font-weight: bold;');
-    console.log('%c[Google Form] Configuration:', 'color: #4CAF50;', {
-        url: GOOGLE_FORM_URL,
-        entryId: GOOGLE_FORM_EMAIL_FIELD
-    });
-
-    const formInitialized = googleFormSubmitter.init(GOOGLE_FORM_URL, GOOGLE_FORM_EMAIL_FIELD);
-    console.log('%c[Google Form] Initialization result:', 'color: #4CAF50;', formInitialized);
-
-    // Test the Google Form integration immediately
-    console.log('%c[Google Form] Running test submission...', 'color: #4CAF50;');
-    googleFormSubmitter.testSubmission('test@morningpages.app').then(result => {
-        console.log('%c[Google Form] Test submission result:', 'color: #4CAF50;', result);
-    }).catch(error => {
-        console.error('%c[Google Form] Test submission error:', 'color: #FF5252;', error);
-    });
 
     // Initialize collapsible sections
     const collapsibles = document.querySelectorAll('.collapsible');
@@ -103,8 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBarFill = document.getElementById('progress-bar-fill');
     const analysisSection = document.getElementById('analysis-section');
     const celebrationContainer = document.getElementById('celebration-container');
-    const loginForm = document.getElementById('login-form');
-    const loginContainer = document.getElementById('login-container');
     const appContent = document.getElementById('app-content');
     const sidebarToggle = document.querySelector('.sidebar-toggle');
     const sidebar = document.querySelector('.sidebar');
@@ -119,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalWords = 0;
     let streak = 0;
     let lastWritingDate = null;
-    let currentUser = null;
+    let currentUser = 'local';
     let writingSpeedData = [];
     let keywords = new Set();
 
@@ -129,119 +103,110 @@ document.addEventListener('DOMContentLoaded', () => {
         mainContent.classList.toggle('sidebar-open');
     });
 
-    // Login Handler
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        
+    // Initialize app directly — no login required
+    (async () => {
         try {
-            console.log('Attempting login for:', email);
-            
-            // Check if user exists
-            const user = await storageManager.getUser(email);
-            console.log('User check result:', user ? 'Found' : 'Not found');
-            
-            if (!user) {
-                // Create new user if doesn't exist
-                console.log('Creating new user');
-                await storageManager.createUser(email, password);
-                
-                // Submit email to Google Form when a new user registers
-                console.log('Submitting new user email to Google Form:', email);
-                const submitted = await googleFormSubmitter.submitEmail(email);
-                console.log('Google Form submission result:', submitted);
-                
-                console.log('New user created successfully');
-            } else {
-                // Verify password for existing user
-                const hashedPassword = await storageManager.hashPassword(password);
-                if (hashedPassword !== user.password) {
-                    throw new Error('Invalid password');
-                }
-                console.log('Password verified successfully');
-            }
-            
-            // Update last login
-            await storageManager.updateUserLastLogin(email);
-            console.log('Last login updated');
-            
-            // Set current user
-            currentUser = email;
-            console.log('Current user set to:', currentUser);
-            
-            // Hide login form and show app content with proper transitions
-            console.log('Starting transition to main app...');
-            loginContainer.classList.add('hidden');
-            
-            // Wait for login container to fade out before showing app content
-            setTimeout(async () => {
-                try {
-                    // Initialize app state
-                    console.log('Initializing app state...');
-                    
-                    // Show app content first
-                    appContent.style.display = 'block';
-                    void appContent.offsetWidth; // Force reflow
-                    appContent.classList.add('visible');
-                    
-                    // Then load user data
-                    await loadUserData();
-                    
-                    // Initialize text editor with today's writing if available
-                    const todayWriting = await storageManager.getTodayWriting();
-                    if (todayWriting) {
-                        console.log('Loading today\'s writing...');
-                        textEditor.value = todayWriting.text;
-                        updateWordCount(todayWriting.wordCount);
-                    }
-                    
-                    // Start tracking writing speed
-                    startTime = Date.now();
-                    
-                    // Initialize text input handlers
-                    textEditor.addEventListener('input', handleTextInput);
-                    textEditor.addEventListener('keydown', handleKeyDown);
-                    
-                    // Initialize charts
-                    displayEmotionsChart(analyzeEmotions(textEditor.value));
-                    displayTopicsChart(analyzeTopics(textEditor.value));
-                    displaySpeedGraph();
-                    displayKeywordCloud();
-                    
-                    console.log('Login successful, app initialized');
-                } catch (error) {
-                    console.error('Error during app initialization:', error);
-                    // Show error message to user
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'error-message';
-                    errorDiv.textContent = error.message;
-                    loginForm.appendChild(errorDiv);
-                    
-                    // Remove error message after 3 seconds
-                    setTimeout(() => errorDiv.remove(), 3000);
-                    
-                    // Reset UI state
-                    loginContainer.classList.remove('hidden');
-                    appContent.style.display = 'none';
-                    appContent.classList.remove('visible');
-                }
-            }, 300);
-            
+            void appContent.offsetWidth; // force reflow for CSS transition
+            appContent.classList.add('visible');
+            await loadUserData();
+            startTime = Date.now();
+            textEditor.addEventListener('keydown', handleKeyDown);
+            displayEmotionsChart(analyzeEmotions(textEditor.value));
+            displayTopicsChart(analyzeTopics(textEditor.value));
+            displaySpeedGraph();
+            displayKeywordCloud();
         } catch (error) {
-            console.error("Login error:", error);
-            // Show error message to user
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.textContent = error.message === 'Invalid password' 
-                ? 'Invalid password. Please try again.'
-                : 'Failed to load your data. Please try again.';
-            loginForm.appendChild(errorDiv);
-            
-            // Remove error message after 3 seconds
-            setTimeout(() => errorDiv.remove(), 3000);
+            console.error('Error initializing app:', error);
         }
-    });
+    })();
+
+    // Download session — text + all analyses as a self-contained HTML report
+    async function downloadSession() {
+        const text = textEditor.value.trim();
+        if (!text) return;
+
+        const date = new Date().toLocaleDateString('en-US', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+        const wordCount = optimizedCountWords(text);
+
+        // Capture chart canvases as base64 images
+        const emotionsCanvas = document.getElementById('emotions-chart');
+        const topicsCanvas   = document.getElementById('topics-chart');
+        const speedCanvas    = document.getElementById('speed-graph');
+        const emotionsImg    = emotionsCanvas ? emotionsCanvas.toDataURL('image/png') : null;
+        const topicsImg      = topicsCanvas   ? topicsCanvas.toDataURL('image/png')   : null;
+        const speedImg       = speedCanvas    ? speedCanvas.toDataURL('image/png')     : null;
+
+        // Capture keyword cloud SVG
+        const keywordSvgEl  = document.querySelector('#keyword-cloud svg');
+        const keywordSvgStr = keywordSvgEl
+            ? new XMLSerializer().serializeToString(keywordSvgEl)
+            : '<p style="color:#aaa;">No keywords yet</p>';
+
+        const chartBlock = (label, imgSrc) => imgSrc
+            ? `<div class="chart-block">
+                 <h3>${label}</h3>
+                 <img src="${imgSrc}" alt="${label}" style="width:100%;border-radius:8px;">
+               </div>`
+            : '';
+
+        const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Morning Pages — ${date}</title>
+  <style>
+    body { background:#1a1a2e; color:#e0e0e0; font-family:Georgia,serif; max-width:860px; margin:0 auto; padding:2rem; }
+    h1 { color:#00ff9d; font-size:1.6rem; margin-bottom:0.2rem; }
+    .meta { color:#888; font-size:0.9rem; margin-bottom:2rem; }
+    .writing { background:#16213e; border-left:4px solid #00ff9d; padding:1.5rem; border-radius:8px;
+                white-space:pre-wrap; line-height:1.8; font-size:1rem; margin-bottom:2rem; }
+    h2 { color:#00ff9d; font-size:1.2rem; border-bottom:1px solid #333; padding-bottom:0.4rem; margin-top:2rem; }
+    .charts { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-top:1rem; }
+    .chart-block { background:#16213e; padding:1rem; border-radius:8px; }
+    .chart-block h3 { color:#aaa; font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; margin:0 0 0.75rem; }
+    .keyword-block { background:#16213e; padding:1rem; border-radius:8px; margin-top:1.5rem; }
+    .keyword-block h3 { color:#aaa; font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; margin:0 0 0.75rem; }
+    svg text { fill:#e0e0e0 !important; }
+    footer { color:#555; font-size:0.75rem; text-align:center; margin-top:3rem; }
+  </style>
+</head>
+<body>
+  <h1>Morning Pages</h1>
+  <p class="meta">${date} &nbsp;·&nbsp; ${wordCount} words</p>
+
+  <h2>Writing</h2>
+  <div class="writing">${text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+
+  <h2>Analysis</h2>
+  <div class="charts">
+    ${chartBlock('Emotional Tone', emotionsImg)}
+    ${chartBlock('Topic Distribution', topicsImg)}
+    ${chartBlock('Writing Speed', speedImg)}
+  </div>
+
+  <div class="keyword-block">
+    <h3>Keywords</h3>
+    ${keywordSvgStr}
+  </div>
+
+  <footer>Generated by Morning Pages App · ${new Date().toISOString()}</footer>
+</body>
+</html>`;
+
+        const blob = new Blob([html], { type: 'text/html' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = `morning-pages-${new Date().toISOString().split('T')[0]}.html`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // Wire download buttons
+    document.getElementById('download-btn').addEventListener('click', downloadSession);
+    document.getElementById('celebration-download-btn').addEventListener('click', downloadSession);
 
     function handleTextInput() {
         const text = textEditor.value;

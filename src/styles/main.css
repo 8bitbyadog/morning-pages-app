@@ -820,3 +820,26 @@ input:focus {
   max-height: 2000px; /* Increased to accommodate all affirmations */
   transition: max-height 0.8s ease;
 } 
+/* Download button */
+.download-btn {
+  background: transparent;
+  border: 1px solid var(--accent-color);
+  color: var(--accent-color);
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.download-btn:hover {
+  background: var(--accent-color);
+  color: #1a1a1a;
+}
+
+.celebration-download {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.2rem;
+}
