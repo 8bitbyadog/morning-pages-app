@@ -8,8 +8,8 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/jasondavies/d3-cloud/build/d3.layout.cloud.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" crossorigin src="./assets/index-C4VEb1z4.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-CXlKrjok.css">
+  <script type="module" crossorigin src="./assets/index-_fFVkR9T.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-FM6UgDl0.css">
 </head>
 <body>
     <div class="app-container">
@@ -83,24 +83,8 @@
 
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Login Form -->
-            <div class="login-container" id="login-container">
-                <h2>Welcome to Morning Pages</h2>
-                <form class="login-form" id="login-form">
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" required>
-                    </div>
-                    <button type="submit" class="login-button">Login / Sign Up</button>
-                </form>
-            </div>
-
-            <!-- App Content (hidden until logged in) -->
-            <div id="app-content" style="display: none;">
+            <!-- App Content -->
+            <div id="app-content" style="display: block;">
                 <header>
                     <h1>Morning Pages</h1>
                     <div class="stats-summary">
@@ -112,6 +96,12 @@
                         </div>
                         <div class="stat-item">
                             <span id="avg-pace">⚡ 0 wpm</span>
+                        </div>
+                        <div class="stat-item">
+                            <div class="download-group">
+                                <button id="download-html-btn" class="download-btn" title="Download as HTML report">⬇ HTML</button>
+                                <button id="download-md-btn" class="download-btn" title="Download as Markdown">⬇ MD</button>
+                            </div>
                         </div>
                     </div>
                 </header>
@@ -161,11 +151,19 @@
         <div class="congrats-message">
             <h2>🎉 Congratulations! 🎉</h2>
             <p>You've reached your daily goal!</p>
+            <div class="download-group celebration-download-group">
+                <button id="celebration-html-btn" class="download-btn celebration-download">⬇ HTML</button>
+                <button id="celebration-md-btn" class="download-btn celebration-download">⬇ Markdown</button>
+            </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/jasondavies/d3-cloud/build/d3.layout.cloud.js"></script>
+    
+    <div class="admin-link" style="position: fixed; bottom: 10px; right: 10px; opacity: 0.5; font-size: 12px;">
+        <a href="admin.html" style="color: #666; text-decoration: none;">Admin</a>
+    </div>
 </body>
 </html> 
