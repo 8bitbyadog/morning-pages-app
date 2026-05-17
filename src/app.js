@@ -111,10 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
             await loadUserData();
             startTime = Date.now();
             textEditor.addEventListener('keydown', handleKeyDown);
-            displayEmotionsChart(analyzeEmotions(textEditor.value));
-            displayTopicsChart(analyzeTopics(textEditor.value));
-            displaySentimentArc(analyzeSentimentArc(textEditor.value));
-            displayKeywordCloud();
         } catch (error) {
             console.error('Error initializing app:', error);
         }
@@ -310,6 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (count >= wordGoal && !goalReached) {
             goalReached = true;
+            showAnalysis();
             showCelebration();
         }
     }, 100);
@@ -327,9 +324,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function analyzeText(text) {
-        const emotions = analyzeEmotions(text);
+        const { counts: emotions, matchedWords } = analyzeEmotions(text);
         const topics = analyzeTopics(text);
-        displayEmotionsChart(emotions);
+        displayEmotionsChart(emotions, matchedWords);
         displayTopicsChart(topics);
         displaySentimentArc(analyzeSentimentArc(text));
         displayKeywordCloud();
@@ -340,29 +337,37 @@ document.addEventListener('DOMContentLoaded', () => {
             joy: 0, sadness: 0, anger: 0, fear: 0, longing: 0,
             peace: 0, awe: 0, shame: 0, gratitude: 0, restlessness: 0, tenderness: 0
         };
+        const matched = {};
+        Object.keys(counts).forEach(e => { matched[e] = new Set(); });
 
         const emotionKeywords = {
-            joy: ['happy','happiness','glad','pleased','delight','delighted','bright','laugh','laughing','smile','smiled','bliss','blissful','elated','cheerful','wonderful','amazing','love','loved','loving','glee','gleeful','content','contented','jubilant','radiant','joyful','joyous'],
-            sadness: ['sad','sadness','unhappy','grief','grieve','sorrow','sorrowful','depressed','depression','lonely','loneliness','hurt','heartbreak','heartbroken','cry','crying','tears','weep','weeping','loss','mourn','mourning','heavy','empty','hollow','blue','gloomy','gloom','despair','despairing','bereft'],
-            anger: ['angry','anger','mad','furious','fury','rage','hate','hatred','hated','hateful','annoyed','irritated','frustrated','frustration','bitter','bitterness','resentment','resent','hostile','outrage','outraged','livid','seething','contempt'],
-            fear: ['afraid','fear','fearful','scared','anxiety','anxious','worried','worry','panic','panicked','terror','terrified','dread','dreading','nervous','nervousness','tense','tension','horror','horrified','uneasy','apprehensive','timid'],
-            longing: ['longing','miss','missed','missing','yearn','yearning','nostalgia','nostalgic','wistful','wish','wishing','hunger','hungering','thirst','craving','want','wanting','desire','desiring','lonesome','pine','pining','absence'],
-            peace: ['peace','peaceful','calm','calming','serene','serenity','tranquil','tranquility','quiet','stillness','still','restful','rest','relaxed','relaxing','ease','settled','centered','grounded','acceptance','accepting','surrender','surrendering'],
-            awe: ['awe','wonder','amazed','amazement','astonished','breathtaking','magnificent','beautiful','beauty','sublime','vast','infinite','overwhelmed','moved','speechless','reverent','reverence','sacred','mystery','mysterious','miracle','miraculous','holy','luminous','radiant','stunning'],
-            shame: ['shame','ashamed','guilty','guilt','embarrassed','embarrassment','humiliated','humiliation','regret','regretful','sorry','worthless','failure','failed','disgrace','disgraced','inadequate','flawed','unworthy','small'],
-            gratitude: ['grateful','gratitude','thankful','thank','thanks','appreciate','appreciated','appreciation','blessed','blessing','bless','fortunate','lucky','abundance','abundant','gift','given','receive','received','grace','gracious'],
+            joy:          ['happy','happiness','glad','pleased','delight','delighted','bright','laugh','laughing','smile','smiled','bliss','blissful','elated','cheerful','wonderful','amazing','love','loved','loving','glee','gleeful','contented','jubilant','radiant','joyful','joyous'],
+            sadness:      ['sad','sadness','unhappy','grief','grieve','sorrow','sorrowful','depressed','depression','lonely','loneliness','hurt','heartbreak','heartbroken','cry','crying','tears','weep','weeping','loss','mourn','mourning','heavy','empty','hollow','blue','gloomy','gloom','despair','despairing','bereft'],
+            anger:        ['angry','anger','furious','fury','rage','hate','hatred','hated','hateful','annoyed','irritated','frustrated','frustration','bitter','bitterness','resentment','resent','hostile','outrage','outraged','livid','seething','contempt'],
+            fear:         ['afraid','fear','fearful','scared','anxiety','anxious','worried','worry','panic','panicked','terror','terrified','dread','dreading','nervous','nervousness','horror','horrified','uneasy','apprehensive','timid'],
+            longing:      ['longing','miss','missed','missing','yearn','yearning','nostalgia','nostalgic','wistful','wish','wishing','hunger','hungering','thirst','craving','desire','desiring','lonesome','pine','pining','absence'],
+            peace:        ['peace','peaceful','calm','calming','serene','serenity','tranquil','tranquility','quiet','stillness','restful','relaxed','relaxing','ease','settled','centered','grounded','acceptance','accepting','surrender','surrendering'],
+            awe:          ['awe','amazed','amazement','astonished','breathtaking','magnificent','beautiful','beauty','sublime','vast','infinite','moved','speechless','reverent','reverence','sacred','mystery','mysterious','miracle','miraculous','holy','luminous','radiant','stunning'],
+            shame:        ['shame','ashamed','guilty','guilt','embarrassed','embarrassment','humiliated','humiliation','regret','regretful','worthless','failure','failed','disgrace','disgraced','inadequate','flawed','unworthy'],
+            gratitude:    ['grateful','gratitude','thankful','appreciate','appreciated','appreciation','blessed','blessing','bless','fortunate','lucky','abundance','abundant','gift'],
             restlessness: ['restless','restlessness','agitated','agitation','edgy','unsettled','jumpy','frantic','hectic','overwhelmed','scattered','distracted','racing','fidgety','impatient','impatience','frenzied','spinning','churning'],
-            tenderness: ['tender','tenderness','gentle','soft','delicate','fragile','vulnerable','vulnerability','compassion','compassionate','empathy','empathetic','caring','nurture','nurturing','cherish','cherished','held','holding','affection','affectionate','kind','kindness']
+            tenderness:   ['tender','tenderness','gentle','soft','delicate','fragile','vulnerable','vulnerability','compassion','compassionate','empathy','empathetic','caring','nurture','nurturing','cherish','cherished','affection','affectionate','kindness']
         };
 
         const words = text.toLowerCase().match(/\b[a-z]+\b/g) || [];
         words.forEach(word => {
             for (const [emotion, kws] of Object.entries(emotionKeywords)) {
-                if (kws.includes(word)) counts[emotion]++;
+                if (kws.includes(word)) {
+                    counts[emotion]++;
+                    matched[emotion].add(word);
+                }
             }
         });
 
-        return counts;
+        const matchedWords = {};
+        Object.entries(matched).forEach(([e, s]) => { matchedWords[e] = [...s]; });
+
+        return { counts, matchedWords };
     }
 
     function analyzeTopics(text) {
@@ -427,17 +432,17 @@ document.addEventListener('DOMContentLoaded', () => {
         return colors[emotion] || `rgba(52, 152, 219, ${alpha})`;
     }
 
-    function displayEmotionsChart(emotions) {
-        // Calculate percentages
-        const total = Object.values(emotions).reduce((a, b) => a + b, 0);
-        const emotionsWithPercentages = Object.entries(emotions).map(([emotion, count]) => ({
+    function displayEmotionsChart(emotions, matchedWords = {}) {
+        const MIN_THRESHOLD = 3;
+        const qualifying = Object.entries(emotions).filter(([, count]) => count >= MIN_THRESHOLD);
+        const total = qualifying.reduce((sum, [, count]) => sum + count, 0);
+        const emotionsWithData = qualifying.map(([emotion, count]) => ({
             emotion,
             count,
-            percentage: total > 0 ? (count / total) * 100 : 0
+            percentage: total > 0 ? (count / total) * 100 : 0,
+            words: matchedWords[emotion] || []
         }));
-
-        // Create the chart
-        createEmotionsChart(emotionsWithPercentages, 'emotions-chart');
+        createEmotionsChart(emotionsWithData, 'emotions-chart');
     }
 
     function displayTopicsChart(topics) {
@@ -455,24 +460,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function analyzeSentimentArc(text) {
         const words = text.trim().split(/\s+/).filter(w => w.length > 0);
-        if (words.length < 50) return null;
+        if (words.length < 30) return null;
 
         const positiveWords = new Set([
-            'happy','glad','delight','delighted','bright','laugh','smile','bliss','elated','joyful',
-            'wonderful','love','loved','joy','content','calm','serene','tranquil','peaceful','quiet',
-            'settled','grounded','ease','soft','wonder','awe','sacred','beautiful','beauty','reverent',
-            'grateful','thankful','appreciate','blessed','fortunate','abundance','grace','gracious',
-            'gentle','tender','fragile','compassion','nurture','cherish','warm','open','free','alive',
-            'whole','hope','hopeful','light','luminous','moved','breathtaking','magnificent','sublime'
+            // joy
+            'happy','happiness','glad','pleased','delight','delighted','bright','laugh','laughing',
+            'smile','smiled','bliss','blissful','elated','cheerful','wonderful','amazing','love',
+            'loved','loving','glee','gleeful','content','contented','jubilant','radiant','joyful','joyous',
+            // peace
+            'peace','peaceful','calm','calming','serene','serenity','tranquil','tranquility','quiet',
+            'stillness','still','restful','rest','relaxed','relaxing','ease','settled','centered',
+            'grounded','acceptance','accepting','surrender','surrendering',
+            // awe
+            'awe','wonder','amazed','amazement','astonished','breathtaking','magnificent','beautiful',
+            'beauty','sublime','vast','infinite','moved','speechless','reverent','reverence','sacred',
+            'mystery','mysterious','miracle','miraculous','holy','luminous','stunning',
+            // gratitude
+            'grateful','gratitude','thankful','thank','thanks','appreciate','appreciated','appreciation',
+            'blessed','blessing','bless','fortunate','lucky','abundance','abundant','gift','given',
+            'receive','received','grace','gracious',
+            // tenderness
+            'tender','tenderness','gentle','soft','delicate','fragile','vulnerable','vulnerability',
+            'compassion','compassionate','empathy','empathetic','caring','nurture','nurturing',
+            'cherish','cherished','held','holding','affection','affectionate','kind','kindness'
         ]);
 
         const negativeWords = new Set([
-            'sad','grief','sorrow','lonely','hurt','heartbreak','weep','loss','mourn','heavy','empty',
-            'hollow','gloomy','despair','angry','anger','rage','hate','bitter','resentment','furious',
-            'afraid','fear','dread','panic','terror','anxious','worried','horror','uneasy',
-            'shame','guilt','regret','worthless','disgrace','failure','inadequate','unworthy',
-            'restless','agitated','frantic','scattered','overwhelmed','tense','impatient','spinning',
-            'pain','suffering','broken','lost','stuck','trapped','numb','darkness','absent'
+            // sadness
+            'sad','sadness','unhappy','grief','grieve','sorrow','sorrowful','depressed','depression',
+            'lonely','loneliness','hurt','heartbreak','heartbroken','cry','crying','tears','weep',
+            'weeping','loss','mourn','mourning','heavy','empty','hollow','blue','gloomy','gloom',
+            'despair','despairing','bereft',
+            // anger
+            'angry','anger','mad','furious','fury','rage','hate','hatred','hated','hateful','annoyed',
+            'irritated','frustrated','frustration','bitter','bitterness','resentment','resent',
+            'hostile','outrage','outraged','livid','seething','contempt',
+            // fear
+            'afraid','fear','fearful','scared','anxiety','anxious','worried','worry','panic',
+            'panicked','terror','terrified','dread','dreading','nervous','nervousness','tense',
+            'tension','horror','horrified','uneasy','apprehensive','timid',
+            // shame
+            'shame','ashamed','guilty','guilt','embarrassed','embarrassment','humiliated','humiliation',
+            'regret','regretful','sorry','worthless','failure','failed','disgrace','disgraced',
+            'inadequate','flawed','unworthy','small',
+            // restlessness
+            'restless','restlessness','agitated','agitation','edgy','unsettled','jumpy','frantic',
+            'hectic','overwhelmed','scattered','distracted','racing','fidgety','impatient','impatience',
+            'frenzied','spinning','churning'
         ]);
 
         const segmentCount = 5;
@@ -504,11 +538,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const ctx = canvas.getContext('2d');
         const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#00ff9d';
 
-        if (window.speedChart) {
-            window.speedChart.destroy();
-            window.speedChart = null;
-        }
-
         let placeholder = document.getElementById('sentiment-placeholder');
         if (!scores) {
             canvas.style.display = 'none';
@@ -518,12 +547,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 placeholder.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;color:rgba(179,179,179,0.7);font-size:13px;text-align:center;padding:1rem;';
                 canvas.parentNode.appendChild(placeholder);
             }
-            placeholder.textContent = 'Write 50+ words to see your sentiment arc';
+            placeholder.textContent = 'Write more to see your sentiment arc';
             return;
         }
 
         canvas.style.display = '';
         if (placeholder) placeholder.remove();
+
+        if (window.speedChart) {
+            window.speedChart.data.datasets[0].data = scores;
+            window.speedChart.update('none');
+            return;
+        }
 
         window.speedChart = new Chart(ctx, {
             type: 'line',
@@ -581,36 +616,51 @@ document.addEventListener('DOMContentLoaded', () => {
     // Create or update the emotions chart
     function createEmotionsChart(emotions, containerId) {
         const canvas = document.getElementById(containerId);
-        const ctx = canvas.getContext('2d');
-        
-        // Get CSS variables
-        const textPrimary = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim();
-        const textSecondary = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim();
-        
-        // Check if chart already exists and destroy it
-        if (window.emotionsChart) {
-            window.emotionsChart.destroy();
+        let placeholder = document.getElementById('emotions-placeholder');
+
+        if (emotions.length === 0) {
+            canvas.style.display = 'none';
+            if (!placeholder) {
+                placeholder = document.createElement('div');
+                placeholder.id = 'emotions-placeholder';
+                placeholder.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;color:rgba(179,179,179,0.7);font-size:13px;text-align:center;padding:1rem;';
+                canvas.parentNode.appendChild(placeholder);
+            }
+            placeholder.textContent = 'Keep writing — emotions appear after 3 keyword matches';
+            return;
         }
-        
-        // Sort emotions by percentage
+
+        canvas.style.display = '';
+        if (placeholder) placeholder.remove();
+
         const sortedEmotions = emotions.sort((a, b) => b.percentage - a.percentage);
-        
-        // Get labels and data
         const labels = sortedEmotions.map(item => item.emotion);
         const data = sortedEmotions.map(item => item.percentage);
-        
-        // Colors for emotions
         const backgroundColors = sortedEmotions.map(item => getEmotionColor(item.emotion, 0.7));
         const borderColors = sortedEmotions.map(item => getEmotionColor(item.emotion, 1));
-        
-        // Create the chart
+        const wordsByIndex = sortedEmotions.map(item => item.words || []);
+
+        if (window.emotionsChart) {
+            window.emotionsChart._matchedWords = wordsByIndex;
+            window.emotionsChart.data.labels = labels;
+            window.emotionsChart.data.datasets[0].data = data;
+            window.emotionsChart.data.datasets[0].backgroundColor = backgroundColors;
+            window.emotionsChart.data.datasets[0].borderColor = borderColors;
+            window.emotionsChart.update('none');
+            return;
+        }
+
+        const ctx = canvas.getContext('2d');
+        const textPrimary = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim();
+        const textSecondary = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim();
+
         window.emotionsChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: labels,
+                labels,
                 datasets: [{
                     label: 'Emotional Tone',
-                    data: data,
+                    data,
                     backgroundColor: backgroundColors,
                     borderColor: borderColors,
                     borderWidth: 1
@@ -632,7 +682,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return `${context.parsed.x}%`;
+                                const pct = Math.round(context.parsed.x);
+                                const words = (window.emotionsChart._matchedWords || [])[context.dataIndex] || [];
+                                const lines = [`${pct}% of emotional content`];
+                                if (words.length) lines.push(`matched: ${words.join(', ')}`);
+                                return lines;
                             }
                         }
                     },
@@ -660,28 +714,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 },
                 animation: {
-                    duration: 500
+                    duration: 300
                 }
             }
         });
+        window.emotionsChart._matchedWords = wordsByIndex;
     }
 
     function createTopicsChart(topics, containerId) {
+        const palette = ['#4CAF50','#FF9800','#9C27B0','#2196F3','#F44336','#E91E63','#607D8B'];
+        const sortedTopics = topics.sort((a, b) => b.percentage - a.percentage);
+        const labels = sortedTopics.map(item => item.topic);
+        const data = sortedTopics.map(item => item.percentage);
+        const backgroundColors = sortedTopics.map((_, i) => palette[i]);
+
+        if (window.topicsChart) {
+            window.topicsChart.data.labels = labels;
+            window.topicsChart.data.datasets[0].data = data;
+            window.topicsChart.data.datasets[0].backgroundColor = backgroundColors;
+            window.topicsChart.update('none');
+            return;
+        }
+
         const canvas = document.getElementById(containerId);
         const ctx = canvas.getContext('2d');
         const textPrimary = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim();
         const textSecondary = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim();
-
-        if (window.topicsChart) {
-            window.topicsChart.destroy();
-        }
-
-        const sortedTopics = topics.sort((a, b) => b.percentage - a.percentage);
-        const labels = sortedTopics.map(item => item.topic);
-        const data = sortedTopics.map(item => item.percentage);
-
-        // Fixed 7-color palette: nature, body, memory, self, creativity, relationships, work
-        const palette = ['#4CAF50','#FF9800','#9C27B0','#2196F3','#F44336','#E91E63','#607D8B'];
 
         window.topicsChart = new Chart(ctx, {
             type: 'doughnut',
@@ -824,33 +882,38 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // Update the displayKeywordCloud function
+    const debouncedWordCloud = debounce((text) => {
+        createWordCloud(text, document.getElementById('keyword-cloud'));
+    }, 600);
+
     function displayKeywordCloud() {
-        const cloudContainer = document.getElementById('keyword-cloud');
-        cloudContainer.innerHTML = '';
-        
-        if (!textEditor.value.trim()) {
-            cloudContainer.innerHTML = '<div class="keyword-tag">Start writing to see your most used words</div>';
+        const text = textEditor.value.trim();
+        if (!text) {
+            document.getElementById('keyword-cloud').innerHTML = '<div class="keyword-tag">Start writing to see your most used words</div>';
             return;
         }
-        
-        // Create debounced word cloud function
-        const debouncedWordCloud = debounce((text) => {
-            createWordCloud(text, cloudContainer);
-        }, 500);
-        
-        // Generate word cloud
-        debouncedWordCloud(textEditor.value);
+        debouncedWordCloud(text);
+    }
+
+    function showAnalysis() {
+        document.querySelector('.analysis-container').classList.add('visible');
+        analyzeText(textEditor.value);
     }
 
     function showCelebration() {
         celebrationContainer.classList.add('show');
         createConfetti();
-        
-        setTimeout(() => {
-            celebrationContainer.classList.remove('show');
-        }, 5000);
     }
+
+    function hideCelebration() {
+        celebrationContainer.classList.remove('show');
+    }
+
+    document.getElementById('celebration-close-btn').addEventListener('click', hideCelebration);
+
+    celebrationContainer.addEventListener('click', (e) => {
+        if (e.target === celebrationContainer) hideCelebration();
+    });
 
     function createConfetti() {
         for (let i = 0; i < 50; i++) {
@@ -911,26 +974,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 writingSpeedData = todayWriting.writingSpeedData || [];
                 keywords = new Set(todayWriting.keywords || []);
                 
-                // Update word count and progress bar
                 const wordCount = todayWriting.wordCount || optimizedCountWords(todayWriting.text);
-                updateWordCount(wordCount);
-                
-                // Restore charts if data exists
-                if (todayWriting.emotions) {
-                    displayEmotionsChart(todayWriting.emotions);
+                if (wordCount >= wordGoal) {
+                    goalReached = true;
+                    document.querySelector('.analysis-container').classList.add('visible');
                 }
-                if (todayWriting.topics) {
-                    displayTopicsChart(todayWriting.topics);
-                }
-                
-                // Update writing speed display
+                updateWordCount();
+
                 if (writingSpeedData.length > 0) {
                     const latestSpeed = writingSpeedData[writingSpeedData.length - 1].speed;
                     document.getElementById('avg-pace').textContent = `⚡ ${Math.round(latestSpeed)} wpm`;
                 }
-                
-                // Analyze text if it exists
-                if (todayWriting.text.trim()) {
+
+                if (goalReached && todayWriting.text.trim()) {
                     analyzeText(todayWriting.text);
                 }
             } else {
@@ -948,8 +1004,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     wordHistory = progress.wordHistory || [];
                     writingSpeedData = progress.writingSpeedData || [];
                     keywords = new Set(progress.keywords || []);
-                    updateWordCount(progress.wordCount);
-                    analyzeText(progress.text);
+                    const savedWordCount = progress.wordCount || optimizedCountWords(progress.text);
+                    if (savedWordCount >= wordGoal) {
+                        goalReached = true;
+                        document.querySelector('.analysis-container').classList.add('visible');
+                    }
+                    updateWordCount();
+                    if (goalReached && progress.text.trim()) {
+                        analyzeText(progress.text);
+                    }
                 } else {
                     console.log('No saved progress found in localStorage');
                 }
@@ -976,12 +1039,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Skip streak and total words for now since they're not defined
             console.log('Initializing UI elements...');
-            
-            // Initialize analysis if there's text
-            if (textEditor.value.trim()) {
-                console.log('Analyzing existing text...');
-                analyzeText(textEditor.value);
-            }
             
             console.log('User data loaded successfully');
         } catch (error) {
@@ -1082,7 +1139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = this.value;
         updateWordCount();
         autosave(text);
-        analyzeText(text);
+        if (goalReached) analyzeText(text);
     });
 
     // Add these missing functions

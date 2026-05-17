@@ -201,7 +201,7 @@ h1 {
   align-items: center;
   flex: 1;
   height: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .stat-item {
@@ -283,6 +283,11 @@ h1 {
 /* ─── Analysis section ───────────────────────────────────────────────────── */
 .analysis-container {
   border-top: 1px solid var(--border-color);
+  display: none;
+}
+
+.analysis-container.visible {
+  display: block;
 }
 
 .analysis-container > h2 {
@@ -508,6 +513,25 @@ input:focus {
   max-width: 340px;
   width: 90%;
   animation: popIn 0.25s ease;
+}
+
+.celebration-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  line-height: 1;
+}
+
+.celebration-close:hover { color: var(--text-primary); }
+
+.congrats-message {
+  position: relative;
 }
 
 .congrats-message h2 {
