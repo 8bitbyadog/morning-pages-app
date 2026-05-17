@@ -238,6 +238,9 @@ h1 {
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
+  position: sticky;
+  top: var(--toolbar-h);
+  z-index: 90;
 }
 
 #word-count {
@@ -916,6 +919,9 @@ input:focus {
     flex-grow: 0;
     border-right: none;
   }
+
+  /* Word counter can't be sticky — header height is variable on mobile */
+  .word-counter { position: static; }
 
   /* Editor full-width, no centering column trick */
   #text-editor {
